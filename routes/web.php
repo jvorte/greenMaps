@@ -1,15 +1,21 @@
 <?php
 
+use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ItemController;
 
-Route::resource('items', ItemController::class);
+Route::get('/', function () {
+    return view('welcome');
+})->name('welcome');
+
+// Εμφάνιση φόρμας δημιουργίας
+Route::get('/items/create', [SurveyController::class, 'create'])->name('items.create');
+
+// Αποθήκευση δεδομένων της φόρμας
+Route::post('/items', [SurveyController::class, 'store'])->name('items.store');
 
 
-
-Route::get('/', function () {return view('welcome');})->name('welcome');
-Route::get('/dashboard', function () {return view('dashboard');})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [SurveyController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -17,4 +23,5 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::resource('survey', SurveyController::class);
 require __DIR__.'/auth.php';

@@ -13,12 +13,10 @@
                             </button>
                             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        
                                     <li class="nav-item">
-                                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#newItemModal">+ New</a>
+                                        <a class="nav-link" href="{{ route('items.create') }}" data-bs-toggle="modal" data-bs-target="#newItemModal">+ New</a>
+
                                     </li>
-                                    
-                                 
                                 </ul>
                                 <form class="d-flex" role="search">
                                     <input class="form-control me-2 rounded-1" type="search" placeholder="Search records..." aria-label="Search">
@@ -28,10 +26,56 @@
                         </div>
                     </nav>
 
-                    {{-- Table --}}
-                    <div class="mt-4 ">
-                   
-                        <table class="table table-bordered table-hover ">
+
+
+<!-- Το Modal -->
+<div class="modal fade" id="newItemModal" tabindex="-1" aria-labelledby="newItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newItemModalLabel">Create New Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{{ route('items.store') }}" method="POST">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="summit" class="form-label">Summit</label>
+                        <input type="text" class="form-control" id="summit" name="summit" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="plot" class="form-label">Plot</label>
+                        <input type="text" class="form-control" id="plot" name="plot" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="plantType" class="form-label">Plant Type</label>
+                        <input type="text" class="form-control" id="plantType" name="plant_type" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="surveyType" class="form-label">Survey Type</label>
+                        <input type="text" class="form-control" id="surveyType" name="survey_type" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="species" class="form-label">Species</label>
+                        <input type="text" class="form-control" id="species" name="species" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cover" class="form-label">Cover</label>
+                        <input type="text" class="form-control" id="cover" name="cover" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+                    
+
+
+{{-- Table --}}
+<div class="table-responsive">
+    <table class="table">
+
                             <thead class="">
                                 <tr>
                                     <th>Id</th>
@@ -46,22 +90,27 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>@mdo</td>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>@mdo</td>
-                                    <td>@mdo</td>
-                                    <td>
-                                        <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="View">View</a>
-                                        <a href="#" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit">Edit</a>
-                                        <a href="#" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Delete">Delete</a>
-                                    </td>
-                                </tr>
-                        
+                                @foreach($surveys as $survey)
+                                    <tr>
+                                        <td>{{ $survey->id }}</td>
+                                        <td>{{ $survey->summit }}</td>
+                                        <td>{{ $survey->plot }}</td>
+                                        <td>{{ $survey->plant_type }}</td>
+                                        <td>{{ $survey->survey_type }}</td>
+                                        <td>{{ $survey->species }}</td>
+                                        <td>{{ $survey->cover }}</td>
+                                        <td>{{ $survey->user->name }}</td> <!-- Εμφάνιση του χρήστη που έκανε την καταχώρηση -->
+                                        <td>
+                                            <a href="{{ route('survey.show', $survey->id) }}" class="btn btn-sm btn-primary" data-bs-toggle="tooltip" title="View">View</a>
+                                            <a href="{{ route('survey.edit', $survey->id) }}" class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Edit">Edit</a>
+                                            <form action="{{ route('survey.destroy', $survey->id) }}" method="POST" style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="Delete">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
