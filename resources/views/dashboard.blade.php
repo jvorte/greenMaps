@@ -190,31 +190,7 @@
     </script>
     @endpush
 
-<script>
-   document.querySelectorAll('.summit-link').forEach(link => {
-    link.addEventListener('click', function (e) {
-        e.preventDefault();
-        const summitName = this.getAttribute('data-summit');
 
-        // Κλήση στο API για να πάρουμε τα δεδομένα του summit
-        fetch(`/api/summit/${summitName}`)
-            .then(response => response.json())
-            .then(data => {
-                // Γεμίζουμε το modal με τα δεδομένα
-                const summitDataBody = document.getElementById('summitDataBody');
-                summitDataBody.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;  // Εμφάνιση των δεδομένων σε JSON format
-                
-                // Εμφανίζουμε το modal
-                new bootstrap.Modal(document.getElementById('summitDataModal')).show();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("Σφάλμα στην ανάκτηση των δεδομένων.");
-            });
-    });
-});
-
-</script>
 
 
 
