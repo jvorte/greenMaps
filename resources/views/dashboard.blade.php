@@ -1,3 +1,6 @@
+
+{{-- resources/views/dashboard.blade.php --}}
+
 <x-app-layout>
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -101,6 +104,24 @@
     </div>
 </div>
 
+<!-- Modal για την εμφάνιση δεδομένων κορυφής -->
+<div class="modal fade" id="summitDataModal" tabindex="-1" aria-labelledby="summitDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="summitDataModalLabel">Summit Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="summitDataBody">
+                <!-- Δεδομένα της κορυφής θα εμφανιστούν εδώ -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 {{-- Table --}}
 <div class="table-responsive">
@@ -123,7 +144,12 @@
                                 @foreach($surveys as $survey)
                                     <tr>
                                         <td>{{ $survey->id }}</td>
-                                        <td>{{ $survey->summit }}</td>
+                                        <td>
+                                            <a href="#" class="summit-link" data-summit="{{ $survey->summit }}">{{ $survey->summit }}</a>
+                                        </td>
+                                        
+                                        
+                                        
                                         <td>{{ $survey->plot }}</td>
                                         <td>{{ $survey->plant_type }}</td>
                                         <td>{{ $survey->survey_type }}</td>
@@ -145,6 +171,10 @@
                         </table>
                     </div>
 
+
+
+
+
                 </div>
             </div>
         </div>
@@ -159,5 +189,33 @@
         })
     </script>
     @endpush
+
+<script>
+   document.querySelectorAll('.summit-link').forEach(link => {
+    link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const summitName = this.getAttribute('data-summit');
+
+        // Κλήση στο API για να πάρουμε τα δεδομένα του summit
+        fetch(`/api/summit/${summitName}`)
+            .then(response => response.json())
+            .then(data => {
+                // Γεμίζουμε το modal με τα δεδομένα
+                const summitDataBody = document.getElementById('summitDataBody');
+                summitDataBody.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;  // Εμφάνιση των δεδομένων σε JSON format
+                
+                // Εμφανίζουμε το modal
+                new bootstrap.Modal(document.getElementById('summitDataModal')).show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Σφάλμα στην ανάκτηση των δεδομένων.");
+            });
+    });
+});
+
+</script>
+
+
 
 </x-app-layout>
