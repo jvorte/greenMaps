@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Survey;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Log;
 
 class SurveyController extends Controller
 {
@@ -85,4 +86,39 @@ class SurveyController extends Controller
 
         return redirect()->route('survey.index')->with('success', 'Survey deleted successfully');
     }
+
+
+
+    public function import(Request $request)
+{
+    $request->validate([
+        'csv_file' => 'required|file|mimes:csv,txt',
+    ]);
+
+    $file = $request->file('csv_file');
+    $path = $file->getRealPath();
+    $data = array_map('str_getcsv', file($path));
+
+    // Προαιρετικά: skip header row
+    array_shift($data);
+
+    foreach ($data as $row) {
+        Survey::create([
+            'summit' => $row[0],
+            'plot' => $row[1],
+            'plant_type' => $row[2],
+            'survey_type' => $row[3],
+            'species' => $row[4],
+            'cover' => $row[5],
+            'user_id' => auth()->id(), // ή οποιοδήποτε id θέλεις
+        ]);
+    }
+
+    return redirect()->back()->with('success', 'CSV imported successfully!');
+}
+
+
+
+
+
 }

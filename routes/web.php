@@ -4,6 +4,9 @@ use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+
+
+
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
@@ -14,6 +17,7 @@ Route::get('/items/create', [SurveyController::class, 'create'])->name('items.cr
 // Αποθήκευση δεδομένων της φόρμας
 Route::post('/items', [SurveyController::class, 'store'])->name('items.store');
 
+Route::post('/surveys/import', [SurveyController::class, 'import'])->name('surveys.import');
 
 Route::get('/dashboard', [SurveyController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 

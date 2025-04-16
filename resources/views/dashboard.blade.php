@@ -17,6 +17,10 @@
                                         <a class="nav-link" href="{{ route('items.create') }}" data-bs-toggle="modal" data-bs-target="#newItemModal">+ New</a>
 
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#importCsvModal">📁 Import CSV</a>
+                                    </li>
+                                    
                                 </ul>
                                 <form class="d-flex" role="search">
                                     <input class="form-control me-2 rounded-1" type="search" placeholder="Search records..." aria-label="Search">
@@ -26,6 +30,10 @@
                         </div>
                     </nav>
 
+
+
+
+           
 
 
 <!-- Το Modal -->
@@ -70,6 +78,28 @@
     </div>
 </div>
                     
+<!-- Modal για Import CSV -->
+<div class="modal fade" id="importCsvModal" tabindex="-1" aria-labelledby="importCsvModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ route('surveys.import') }}" method="POST" enctype="multipart/form-data" class="modal-content">
+            @csrf
+            <div class="modal-header">
+                <h5 class="modal-title" id="importCsvModalLabel">Import Surveys from CSV</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="csv_file" class="form-label">Select CSV File</label>
+                    <input type="file" class="form-control" name="csv_file" accept=".csv" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Upload</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 
 {{-- Table --}}
