@@ -6,6 +6,7 @@ use App\Models\Survey;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\DataSourceController;
 
 class SurveyController extends Controller
 {
@@ -43,31 +44,41 @@ class SurveyController extends Controller
     }
 
     // Store new survey data from the form
-    public function store(Request $request)
-    {
-        // Validate incoming request data
-        $request->validate([
-            'summit' => 'required|string|max:255',
-            'plot' => 'required|string|max:255',
-            'plant_type' => 'required|string|max:255',
-            'survey_type' => 'required|string|max:255',
-            'species' => 'required|string|max:255',
-            'cover' => 'required|string|max:255',
-        ]);
+  
+public function store(Request $request)
+{
+    $request->validate([
+        'summit' => 'required|string|max:255',
+        'plot' => 'required|string|max:255',
+        'plant_type' => 'required|string|max:255',
+        'survey_type' => 'required|string|max:255',
+        'species' => 'required|string|max:255',
+        'cover' => 'required|string|max:255',
+    ]);
 
-        // Create new survey record in database
-        Survey::create([
-            'summit' => $request->summit,
-            'plot' => $request->plot,
-            'plant_type' => $request->plant_type,
-            'survey_type' => $request->survey_type,
-            'species' => $request->species,
-            'cover' => $request->cover,
-            'user_id' => auth()->id(),  // Link to the authenticated user
-        ]);
+    // 1. Συντεταγμένες (δοκιμαστικά)
+    $latitude = 47.0707;   // π.χ. Klagenfurt
+    $longitude = 15.4395;
 
-        return redirect()->route('survey.index')->with('success', 'Survey created successfully');
-    }
+    // 2. Φόρτωσε καιρικά δεδομένα
+    $weather = DataSourceController::getWeatherData($latitude, $longitude);
+
+    // 3. Δημιουργία νέου survey με καιρικά δεδομένα
+    Survey::create([
+        'summit' => $request->summit,
+        'plot' => $request->plot,
+        'plant_type' => $request->plant_type,
+        'survey_type' => $request->survey_type,
+        'species' => $request->species,
+        'cover' => $request->cover,
+        'user_id' => auth()->id(),
+        'temperature' => $weather['temperature'] ?? null,
+        'precipitation' => $weather['precipitation'] ?? null,
+        'weather_time' => $weather['time'] ?? null,
+    ]);
+
+    return redirect()->route('survey.index')->with('success', 'Survey created successfully');
+}
 
     // Show form to edit an existing survey
     public function edit($id)
@@ -134,4 +145,6 @@ class SurveyController extends Controller
 
         return redirect()->back()->with('success', 'CSV imported successfully!');
     }
+
+
 }
