@@ -11,25 +11,41 @@ class SurveyController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');  // Διασφαλίζουμε ότι μόνο οι συνδεδεμένοι χρήστες θα έχουν πρόσβαση
+        $this->middleware('auth');  // Ensure only authenticated users can access
     }
 
-    public function index()
+    // Method to display the index page with surveys and search functionality
+    public function index(Request $request)
     {
-        $surveys = Survey::with('user')->get(); 
+        $query = Survey::with('user');  // Fetch related user data
+
+        // If search term exists, apply it to the query
+        if ($search = $request->input('search')) {
+            $query->where(function($q) use ($search) {
+                $q->where('summit', 'like', "%{$search}%")
+                  ->orWhere('plot', 'like', "%{$search}%")
+                  ->orWhere('plant_type', 'like', "%{$search}%")
+                  ->orWhere('survey_type', 'like', "%{$search}%")
+                  ->orWhere('species', 'like', "%{$search}%")
+                  ->orWhere('cover', 'like', "%{$search}%");
+            });
+        }
+
+        $surveys = $query->get();  // Execute the query
+
         return view('dashboard', compact('surveys'));
     }
-    
 
-    // Μέθοδος για την αποθήκευση νέας καταχώρησης
+    // Show form to create new survey
     public function create()
     {
-        return view('Items.create');  // Θα φορτώσει το resources/views/Items/create.blade.php
+        return view('Items.create');  // Returns the view for creating items
     }
 
-    // Αποθήκευση δεδομένων της φόρμας
+    // Store new survey data from the form
     public function store(Request $request)
     {
+        // Validate incoming request data
         $request->validate([
             'summit' => 'required|string|max:255',
             'plot' => 'required|string|max:255',
@@ -39,7 +55,7 @@ class SurveyController extends Controller
             'cover' => 'required|string|max:255',
         ]);
 
-        // Δημιουργία νέου survey
+        // Create new survey record in database
         Survey::create([
             'summit' => $request->summit,
             'plot' => $request->plot,
@@ -47,22 +63,23 @@ class SurveyController extends Controller
             'survey_type' => $request->survey_type,
             'species' => $request->species,
             'cover' => $request->cover,
-            'user_id' => auth()->id(),  // Σύνδεση με τον συνδεδεμένο χρήστη
+            'user_id' => auth()->id(),  // Link to the authenticated user
         ]);
 
         return redirect()->route('survey.index')->with('success', 'Survey created successfully');
     }
 
-    // Μέθοδος για την επεξεργασία καταχώρησης
+    // Show form to edit an existing survey
     public function edit($id)
     {
-        $survey = Survey::findOrFail($id);
+        $survey = Survey::findOrFail($id);  // Find survey by ID
         return view('survey.edit', compact('survey'));
     }
 
-    // Μέθοδος για την ενημέρωση καταχώρησης
+    // Update existing survey data
     public function update(Request $request, $id)
     {
+        // Validate incoming request data
         $request->validate([
             'summit' => 'required|string|max:255',
             'plot' => 'required|string|max:255',
@@ -72,53 +89,49 @@ class SurveyController extends Controller
             'cover' => 'required|string|max:255',
         ]);
 
-        $survey = Survey::findOrFail($id);
-        $survey->update($request->all());
+        $survey = Survey::findOrFail($id);  // Find survey by ID
+        $survey->update($request->all());  // Update survey with request data
 
         return redirect()->route('survey.index')->with('success', 'Survey updated successfully');
     }
 
-    // Μέθοδος για τη διαγραφή καταχώρησης
+    // Delete survey record
     public function destroy($id)
     {
-        $survey = Survey::findOrFail($id);
-        $survey->delete();
+        $survey = Survey::findOrFail($id);  // Find survey by ID
+        $survey->delete();  // Delete survey record
 
         return redirect()->route('survey.index')->with('success', 'Survey deleted successfully');
     }
 
-
-
+    // Method to import CSV data
     public function import(Request $request)
-{
-    $request->validate([
-        'csv_file' => 'required|file|mimes:csv,txt',
-    ]);
-
-    $file = $request->file('csv_file');
-    $path = $file->getRealPath();
-    $data = array_map('str_getcsv', file($path));
-
-    // Προαιρετικά: skip header row
-    array_shift($data);
-
-    foreach ($data as $row) {
-        Survey::create([
-            'summit' => $row[0],
-            'plot' => $row[1],
-            'plant_type' => $row[2],
-            'survey_type' => $row[3],
-            'species' => $row[4],
-            'cover' => $row[5],
-            'user_id' => auth()->id(), // ή οποιοδήποτε id θέλεις
+    {
+        // Validate CSV file input
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt',
         ]);
+
+        $file = $request->file('csv_file');
+        $path = $file->getRealPath();  // Get the real path of the file
+        $data = array_map('str_getcsv', file($path));  // Parse the CSV data
+
+        // Optional: skip header row if present
+        array_shift($data);
+
+        // Iterate over each row in the CSV file and create a new survey record
+        foreach ($data as $row) {
+            Survey::create([
+                'summit' => $row[0],
+                'plot' => $row[1],
+                'plant_type' => $row[2],
+                'survey_type' => $row[3],
+                'species' => $row[4],
+                'cover' => $row[5],
+                'user_id' => auth()->id(),  // Link to authenticated user
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'CSV imported successfully!');
     }
-
-    return redirect()->back()->with('success', 'CSV imported successfully!');
-}
-
-
-
-
-
 }
