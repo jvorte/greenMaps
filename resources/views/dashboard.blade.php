@@ -160,6 +160,11 @@
                             </form>
                         </div>
                     </div>
+<a href="{{ route('climate.view') }}">Προβολή Κλιματικών Δεδομένων</a>
+
+
+
+
 
                     {{-- Data Table --}}
                     <div class="table-responsive">
@@ -224,6 +229,9 @@
             </div>
         </div>
     </div>
+
+   
+
 
     {{-- Add Bootstrap Tooltip Initialization --}}
     @push('scripts')

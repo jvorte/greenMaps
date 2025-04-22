@@ -3,10 +3,16 @@
 use App\Http\Controllers\SurveyController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DataSourceController;
+use App\Http\Controllers\ClimateDataController;
 
-Route::resource('data_sources', DataSourceController::class);
+Route::get('/climate-view', [ClimateDataController::class, 'index']);
+Route::post('/climate-view', [ClimateDataController::class, 'store'])->name('climate.store');
 
+Route::post('/climate-fetch', [ClimateDataController::class, 'fetchClimateData'])->name('climate.fetch');
+
+Route::get('/climate-view', [ClimateDataController::class, 'index'])->name('climate.view');
+
+Route::get('/climate-data', [ClimateDataController::class, 'getClimateData']);
 
 
 Route::get('/', function () {
