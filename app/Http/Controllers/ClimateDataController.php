@@ -111,5 +111,18 @@ public function index()
 
         return redirect()->back()->with('success', 'Climate data stored successfully!');
     }
+
+    public function destroy($id)
+{
+    // Find the climate data record by ID
+    $entry = ClimateData::findOrFail($id);
+
+    // Delete the record
+    $entry->delete();
+
+    // Redirect back with a success message
+    return redirect()->route('climate.index')->with('success', 'Data deleted successfully.');
+}
+
     
 }

@@ -5,6 +5,11 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClimateDataController;
 
+Route::delete('/climate/{id}', [ClimateDataController::class, 'destroy'])->name('climate.destroy');
+
+// Display the list of climate data
+Route::get('/climate', [ClimateDataController::class, 'index'])->name('climate.index');
+
 Route::get('/climate-view', [ClimateDataController::class, 'index']);
 Route::post('/climate-view', [ClimateDataController::class, 'store'])->name('climate.store');
 

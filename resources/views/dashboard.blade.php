@@ -160,7 +160,7 @@
                             </form>
                         </div>
                     </div>
-<a href="{{ route('climate.view') }}">Προβολή Κλιματικών Δεδομένων</a>
+
 
 
 
